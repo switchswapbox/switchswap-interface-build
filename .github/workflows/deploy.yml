@@ -1,0 +1,32 @@
+# Deploy Switchswap
+
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: IPFS Pinata deploy GitHub action
+        id: mainnetpin
+        uses: anantaramdas/ipfs-pinata-deploy-action@v1.6.3
+        with:
+          pin-name: "Switchswap Interface"
+          path: "./build"
+          pinata-api-key: ${{ secrets.PINATA_API_KEY }}
+          pinata-secret-api-key: ${{ secrets.PINATA_API_SECRET_KEY }}
+          remove-old: true
+
+      - name: Pin to Crust
+        uses: crustio/ipfs-crust-action@v1.0.8
+        continue-on-error: true
+        timeout-minutes: 2
+        with:
+          cid: ${{ steps.mainnetpin.outputs.hash }}
+          seeds: ${{ secrets.CRUST_SEEDS }}
