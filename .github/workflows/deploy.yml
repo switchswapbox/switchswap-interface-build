@@ -4,7 +4,7 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy:
@@ -13,7 +13,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Get Tag Version
+        id: getTag
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+
+      - name: Print Version
+        run: echo ${{ steps.getTag.outputs.tag }}
+
       - name: IPFS Pinata deploy GitHub action
+        if: ${{ steps.getTag.outputs.tag != 'main' }}
         id: mainnetpin
         uses: anantaramdas/ipfs-pinata-deploy-action@v1.6.3
         with:
@@ -24,9 +32,28 @@ jobs:
           remove-old: true
 
       - name: Pin to Crust
+        if: ${{ steps.getTag.outputs.tag != 'main' }}
         uses: crustio/ipfs-crust-action@v1.0.8
         continue-on-error: true
         timeout-minutes: 2
         with:
           cid: ${{ steps.mainnetpin.outputs.hash }}
           seeds: ${{ secrets.CRUST_SEEDS }}
+
+      - name: Create GitHub Release
+        if: ${{ steps.getTag.outputs.tag != 'main' }}
+        id: create_release
+        uses: actions/create-release@v1.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.getTag.outputs.tag }}
+          release_name: Release ${{ steps.getTag.outputs.tag }}
+          body: |
+            IPFS hash of the deployment:
+            - CIDv0: `${{ steps.mainnetpin.outputs.hash }}`
+            The latest release is always accessible via our alias to the Cloudflare IPFS gateway at [switchswap.io](https://switchswap.io).
+            You can also access the SwitchSwap directly from an IPFS gateway.
+
+            IPFS gateways:
+            - https://ipfs.io/ipfs/${{ steps.mainnetpin.outputs.hash }}/
