@@ -26,7 +26,7 @@ jobs:
         id: mainnetpin
         uses: anantaramdas/ipfs-pinata-deploy-action@v1.6.3
         with:
-          pin-name: "Switchswap Interface"
+          pin-name: Switchswap Interface Prod ${{ steps.getTag.outputs.tag }}
           path: "./build"
           pinata-api-key: ${{ secrets.PINATA_API_KEY }}
           pinata-secret-api-key: ${{ secrets.PINATA_API_SECRET_KEY }}
