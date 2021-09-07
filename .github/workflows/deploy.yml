@@ -21,9 +21,9 @@ jobs:
       - name: Print Version
         run: echo ${{ steps.getTag.outputs.tag }}
 
-      - name: IPFS Pinata deploy GitHub action
+      - name: IPFS Pinata deploy
         if: ${{ steps.getTag.outputs.tag != 'main' }}
-        id: mainnetpin
+        id: pinIpfs
         uses: anantaramdas/ipfs-pinata-deploy-action@v1.6.3
         with:
           pin-name: Switchswap Interface Prod ${{ steps.getTag.outputs.tag }}
@@ -37,8 +37,19 @@ jobs:
         continue-on-error: true
         timeout-minutes: 2
         with:
-          cid: ${{ steps.mainnetpin.outputs.hash }}
+          cid: ${{ steps.pinIpfs.outputs.hash }}
           seeds: ${{ secrets.CRUST_SEEDS }}
+
+      - name: Update DNSLink
+        env:
+          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+          RECORD_DOMAIN: "switchswap.io"
+          RECORD_NAME: "_dnslink"
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        id: dnslink
+        uses: textileio/cloudflare-update-dnslink@master
+        with:
+          cid: ${{ steps.pinIpfs.outputs.hash }}
 
       - name: Create GitHub Release
         if: ${{ steps.getTag.outputs.tag != 'main' }}
@@ -60,4 +71,4 @@ jobs:
             - https://gateway.pinata.cloud/ipfs/${{ steps.mainnetpin.outputs.hash }}/
             - https://ipfs.infura.io/ipfs/${{ steps.mainnetpin.outputs.hash }}/
 
-            You can visit the [IPFS Gateway Checker](https://ipfs.github.io/public-gateway-checker/) for a complete list of gateways available.
+            Visit the [IPFS Gateway Checker](https://ipfs.github.io/public-gateway-checker/) for a complete list of gateways available.
