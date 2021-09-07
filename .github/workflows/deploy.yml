@@ -30,7 +30,6 @@ jobs:
           path: "./build"
           pinata-api-key: ${{ secrets.PINATA_API_KEY }}
           pinata-secret-api-key: ${{ secrets.PINATA_API_SECRET_KEY }}
-          remove-old: true
 
       - name: Pin to Crust
         if: ${{ steps.getTag.outputs.tag != 'main' }}
@@ -52,9 +51,13 @@ jobs:
           release_name: Release ${{ steps.getTag.outputs.tag }}
           body: |
             IPFS hash of the deployment:
-            - CIDv0: `${{ steps.mainnetpin.outputs.hash }}`
+            - CID: `${{ steps.mainnetpin.outputs.hash }}`
             The latest release is always accessible via our alias to the Cloudflare IPFS gateway at [switchswap.io](https://switchswap.io).
-            You can also access the SwitchSwap directly from an IPFS gateway.
 
+            You can also access the SwitchSwap directly from an IPFS gateway.
             IPFS gateways:
             - https://ipfs.io/ipfs/${{ steps.mainnetpin.outputs.hash }}/
+            - https://gateway.pinata.cloud/ipfs/${{ steps.mainnetpin.outputs.hash }}/
+            - https://ipfs.infura.io/ipfs/${{ steps.mainnetpin.outputs.hash }}/
+
+            You can visit the [IPFS Gateway Checker](https://ipfs.github.io/public-gateway-checker/) for a complete list of gateways available.
