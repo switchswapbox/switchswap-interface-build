@@ -31,14 +31,19 @@ jobs:
           pinata-api-key: ${{ secrets.PINATA_API_KEY }}
           pinata-secret-api-key: ${{ secrets.PINATA_API_SECRET_KEY }}
 
-      - name: Pin to Crust
+      - name: Pin to Crust - Get Hash
+        id: pinIpfsCrust
         if: ${{ steps.getTag.outputs.tag != 'main' }}
-        uses: crustio/ipfs-crust-action@v2.0.3
+        uses: switchswapbox/ipfs-crust-action@v2.0.9
         continue-on-error: true
         timeout-minutes: 2
         with:
           cid: ${{ steps.pinIpfs.outputs.hash }}
+          size: 200000000
           seeds: ${{ secrets.CRUST_SEEDS }}
+
+      - name: Print txHash
+        run: echo ${{ steps.pinIpfsCrust.outputs.txHash }}
 
       - name: Update DNSLink
         env:
