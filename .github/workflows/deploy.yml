@@ -33,11 +33,12 @@ jobs:
 
       - name: Pin to Crust
         if: ${{ steps.getTag.outputs.tag != 'main' }}
-        uses: crustio/ipfs-crust-action@v2.0.3
+        uses: switchswapbox/ipfs-crust-action@v2.0.6
         continue-on-error: true
         timeout-minutes: 2
         with:
           cid: ${{ steps.pinIpfs.outputs.hash }}
+          size: 200000000
           seeds: ${{ secrets.CRUST_SEEDS }}
 
       - name: Update DNSLink
