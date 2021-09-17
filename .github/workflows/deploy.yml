@@ -34,7 +34,7 @@ jobs:
       - name: Pin to Crust - Get Hash
         id: pinIpfsCrust
         if: ${{ steps.getTag.outputs.tag != 'main' }}
-        uses: switchswapbox/ipfs-crust-action@v2.0.7
+        uses: switchswapbox/ipfs-crust-action@v2.0.8
         continue-on-error: true
         timeout-minutes: 2
         with:
