@@ -42,9 +42,6 @@ jobs:
           size: 200000000
           seeds: ${{ secrets.CRUST_SEEDS }}
 
-      - name: Print txHash
-        run: echo ${{ steps.pinIpfsCrust.outputs.txHash }}
-
       - name: Update DNSLink
         env:
           CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
@@ -68,6 +65,10 @@ jobs:
           body: |
             IPFS hash of the deployment:
             - CID: `${{ steps.pinIpfs.outputs.hash }}`
+
+            This release is stored and registered on Crust Network
+            Registration: https://crust.subscan.io/extrinsic/${{ steps.pinIpfsCrust.outputs.txHash }}
+
             The latest release is always accessible via our alias to the Cloudflare IPFS gateway at [switchswap.io](https://switchswap.io).
 
             You can also access SwitchSwap directly from an IPFS gateway.
